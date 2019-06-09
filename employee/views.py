@@ -83,6 +83,25 @@ class EmployeeChunk(APIView):
         # Return response to client.
         return Response({"employees": response}, status=status.HTTP_200_OK)
 
+    def employee_cluster(self, response, chunk_id):
+        # Make cluster of 20 objects.
+        cluster_response = []
+        start_index = 0
+        end_index = 0
+        # If chunk_id is 1 then result belongs between 0 to 20.
+        if chunk_id == 1:
+            start_index = 0
+            end_index = 20
+        # else should belong to chunk_id * 2 to chunk_id * 2 + 20.
+        else:
+            start_index = (chunk_id * 10) + 1
+            end_index = (start_index + 20) - 1
+        # Iterate to cluster 20 object.
+        while start_index <= end_index and start_index < len(response):
+            cluster_response.append(response[start_index])
+            start_index += 1
+        # Return result to called function.
+        return cluster_response
 
     def prepare_data(self, response_data, queryset, index):
         # Convert object to json serilizable.
