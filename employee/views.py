@@ -18,24 +18,11 @@ class EmployeeChunk(APIView):
         row_5th_6th = 0
         row_7th_8th = 0
         score_wise_sorted = 0
-        # Query data from Employee modal in sorted order based on score and
-        # daprtment not equal to Waltzz and data not created within 14 days.
-        employee_queryset = (
-            Employee.objects.all()
-            .order_by("-score")
-            .values()
-            .exclude(
-                Q(department="Waltzz")
-                | Q(date_created__gt=datetime.now() + timedelta(days=-14))
-            )
-            .values()
-        )
-        # Query data which holds department 'Waltzz' and created user within 14 days.
-        # output result would be all data of waltzz department first and then date wise.
-        emp_obj = Employee.objects.raw(
-            "select * from employee_employee where department = 'Waltzz' union all select *\
-             from employee_employee where date_created >= current_date-14 and department != 'Waltzz'"
-        )
+        # Call query_1 function
+        employee_queryset = self.query_1()
+        # Call query_2 function
+        emp_obj = self.query_2()
+
         # Pointing index to last
         row_7th_8th = len(emp_obj) - 1
         # Iterate data on employee_queryset and emp_obj
@@ -82,6 +69,27 @@ class EmployeeChunk(APIView):
             return Response({"employees": cluster_response}, status=status.HTTP_200_OK)
         # Return response to client.
         return Response({"employees": response}, status=status.HTTP_200_OK)
+
+    def query_1(self):
+        # Query data from Employee modal in sorted order based on score and
+        # daprtment not equal to Waltzz and data not created within 14 days.
+        return (
+            Employee.objects.all()
+            .order_by("-score")
+            .exclude(
+                Q(department="Waltzz")
+                | Q(date_created__gt=datetime.now() + timedelta(days=-14))
+            )
+            .values()
+        )
+
+    def query_2(self):
+        # Query data which holds department 'Waltzz' and created user within 14 days.
+        # output result would be all data of waltzz department first and then date wise.
+        return Employee.objects.raw(
+            "select * from employee_employee where department = 'Waltzz' union all select *\
+             from employee_employee where date_created >= current_date-14 and department != 'Waltzz'"
+        )
 
     def employee_cluster(self, response, chunk_id):
         # Make cluster of 20 objects.
