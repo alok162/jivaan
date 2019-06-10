@@ -10,9 +10,12 @@ from django.db.models import Q
 
 
 class EmployeeChunk(APIView):
-    """Get all the brands which is followed by users"""
+    """Get all the employee data"""
 
     def get(self, request, format=None):
+        """
+        Rest Api get method.
+        """
         row_count = 1
         response = []
         row_5th_6th = 0
@@ -92,6 +95,12 @@ class EmployeeChunk(APIView):
         )
 
     def employee_cluster(self, response, chunk_id):
+        """
+        Make cluster of 20 objects.
+        ARGS:
+            response(json) - return json to client request
+            chunk_id(int) - get chunk_id from query parameter from client and based on chunk make cluster of objects.
+        """
         # Make cluster of 20 objects.
         cluster_response = []
         start_index = 0
@@ -112,6 +121,12 @@ class EmployeeChunk(APIView):
         return cluster_response
 
     def prepare_data(self, response_data, queryset, index):
+         """
+        Convert object to json serilizable.        
+        ARGS:
+            response_data(json) - return json to client request
+            queryset(modal_object) - convert modal object row to json format.
+        """
         # Convert object to json serilizable.
         response_data.append(
             {
